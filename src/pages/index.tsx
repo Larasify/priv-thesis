@@ -20,14 +20,13 @@ export default function Home() {
 
   const [position, setPosition] = React.useState({ x: 0, y: 0 });
 
-  const handleDrag = (e: any, ui: { deltaX: number; deltaY: number; }) => {
+  const handleDrag = (e: any, ui: { deltaX: number; deltaY: number }) => {
     const { x, y } = position;
     setPosition({
       x: x + ui.deltaX,
       y: y + ui.deltaY,
     });
   };
-
 
   if (playerRef && playerRef.current) {
     console.log(playerRef.current);
@@ -53,11 +52,16 @@ export default function Home() {
       >
         Boop3
       </button>
-      {image && <img src={image} width={640} height={360} />}
-
-      <Draggable nodeRef={nodeRef} onDrag={handleDrag}>
-        <div ref={nodeRef}>I can be dragged anywhere {position.x} {position.y}</div>
-      </Draggable>
+      {image && (
+        <div className="h-max w-max relative overflow-auto">
+          <img src={image} width={640} height={360} />
+          <Draggable bounds="parent" nodeRef={nodeRef} onDrag={handleDrag}>
+            <div ref={nodeRef} className="w-max">
+              I can be dragged anywhere {position.x} {position.y}
+            </div>
+          </Draggable>
+        </div>
+      )}
     </>
   );
 }
