@@ -1,18 +1,22 @@
+import { useRouter } from "next/router";
 import React, { useRef } from "react";
 
 import dynamic from "next/dynamic";
 
-import captureVideoFrame from "../helpers/capturevideoframe";
+import captureVideoFrame from "../../helpers/capturevideoframe";
 
 import { ReactPlayerProps } from "react-player";
 
 import Draggable from "react-draggable";
 
-const ReactPlayer = dynamic(() => import("../helpers/ReactPlayerWrapper"), {
+const ReactPlayer = dynamic(() => import("../../helpers/ReactPlayerWrapper"), {
   ssr: false,
 });
 
-export default function Home() {
+export default function VideoPage() {
+  const router = useRouter();
+  const { id } = router.query;
+
   const [playing, isPlaying] = React.useState(false);
   const playerRef = useRef(null);
   const [image, setImage] = React.useState(null);
@@ -36,7 +40,7 @@ export default function Home() {
       <ReactPlayer
         playerRef={playerRef}
         playing={playing}
-        url="/files/asdqwe.mp4"
+        url={`/files/${id}.mp4`}
       />
       <div>hi {playing}</div>
       <button onClick={() => isPlaying(true)}>Boop</button>
