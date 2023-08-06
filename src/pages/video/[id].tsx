@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 import dynamic from "next/dynamic";
 
@@ -14,6 +14,19 @@ const ReactPlayer = dynamic(() => import("../../helpers/ReactPlayerWrapper"), {
 });
 
 export default function VideoPage() {
+  const [overlay, setOverlay] = React.useState(null);
+  useEffect(() => {
+    fetch(`/api/getoverlay/12345`)
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        setOverlay(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
   const router = useRouter();
   const { id } = router.query;
 
@@ -24,6 +37,13 @@ export default function VideoPage() {
 
   const [position, setPosition] = React.useState({ x: 0, y: 0 });
 
+  const [state, setState] = React.useState({
+    playedSeconds: 0,
+    played: 0,
+    loaded: 0,
+    loadedSeconds: 0,
+  });
+
   const handleDrag = (e: any, ui: { deltaX: number; deltaY: number }) => {
     const { x, y } = position;
     setPosition({
@@ -32,8 +52,14 @@ export default function VideoPage() {
     });
   };
 
-  if (playerRef && playerRef.current) {
-    console.log(playerRef.current);
+  if (
+    playerRef &&
+    playerRef.current &&
+    (playerRef as ReactPlayerProps).current?.getInternalPlayer()
+  ) {
+    console.log(
+      (playerRef as ReactPlayerProps).current?.getInternalPlayer().currentTime
+    );
   }
   return (
     <>
@@ -41,6 +67,18 @@ export default function VideoPage() {
         playerRef={playerRef}
         playing={playing}
         url={`/files/${id}.mp4`}
+        controls={true}
+        onPlay={() => isPlaying(true)}
+        onPause={() => isPlaying(false)}
+        onProgress={(e) => {
+          console.log(e);
+          setState({
+            playedSeconds: e.playedSeconds,
+            played: e.played,
+            loaded: e.loaded,
+            loadedSeconds: e.loadedSeconds,
+          });
+        }}
       />
       <div>hi {playing}</div>
       <button onClick={() => isPlaying(true)}>Boop</button>
@@ -56,14 +94,26 @@ export default function VideoPage() {
       >
         Boop3
       </button>
+      {(playerRef as ReactPlayerProps).current?.getInternalPlayer() && (
+        <div>
+          {
+            (playerRef as ReactPlayerProps).current?.getInternalPlayer()
+              .currentTime
+          }
+        </div>
+      )}
+      <div>{state.playedSeconds}</div>
       {image && (
-        <div className="h-max w-max relative overflow-auto">
-          <Draggable bounds="parent" nodeRef={nodeRef} onDrag={handleDrag}>
-            <div ref={nodeRef} className="w-max">
-              I can be dragged anywhere {position.x} {position.y}
+        <div className="h-[360px] w-[640px] relative overflow-hidden">
+          <img src={image} className="w-[640px] h-[360px]" alt="hey" />
+          <Draggable defaultPosition={{x:0, y:-360}} bounds="parent" nodeRef={nodeRef} onDrag={handleDrag}>
+            <div
+              ref={nodeRef}
+              className=" w-24 h-24 text-teal-300 border-teal-300 border-8 p-4"
+            >
+              {position.x} {position.y}
             </div>
           </Draggable>
-          <img src={image} width={640} height={360} />
         </div>
       )}
     </>

@@ -16,6 +16,7 @@ export default function handler(
   shell.cd('pages');
   
   shell.echo('hello world');
+  shell.exec('echo waitlol')
   //console.log(shell.ls()[0]);
   const files:string[] = []
   shell.ls().forEach(function (file: string) {
