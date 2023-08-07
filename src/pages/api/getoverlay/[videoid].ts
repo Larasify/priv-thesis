@@ -15,7 +15,7 @@ type Data = {
 let first_x = 320
 let first_y = 180
 const data: Data[] = [];
-for (let i = 0; i < 1100; i++) {
+for (let i = 0; i < 3300; i++) {
   //randomly move the coordinates by 10 pixels dont go over 640x360
 
   first_x = first_x + Math.floor(Math.random() * 30) - 15

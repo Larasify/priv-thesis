@@ -1,67 +1,88 @@
-import React, { useRef } from "react";
+import React, { FormEvent, useRef, useState } from "react";
 
 import dynamic from "next/dynamic";
 
-import captureVideoFrame from "../helpers/capturevideoframe";
-
-import { ReactPlayerProps } from "react-player";
-
-import Draggable from "react-draggable";
-
-const ReactPlayer = dynamic(() => import("../helpers/ReactPlayerWrapper"), {
-  ssr: false,
-});
+import { FaArrowRight } from "react-icons/fa";
+import toast from "react-hot-toast";
+import { z } from "zod";
+import { useRouter } from "next/router";
+import { v4 } from 'uuid';
 
 export default function Home() {
-  const [playing, isPlaying] = React.useState(false);
-  const playerRef = useRef(null);
-  const [image, setImage] = React.useState(null);
-  const nodeRef = React.useRef(null);
+  const router = useRouter();
 
-  const [position, setPosition] = React.useState({ x: 0, y: 0 });
+  const [isJoiningRoom, setIsJoiningRoom] = useState(false);
+  const codeRef = useRef<HTMLInputElement>(null);
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
-  const handleDrag = (e: any, ui: { deltaX: number; deltaY: number }) => {
-    const { x, y } = position;
-    setPosition({
-      x: x + ui.deltaX,
-      y: y + ui.deltaY,
-    });
+    if (codeRef && codeRef.current) {
+      const roomCode = codeRef.current.value;
+      //console.log(roomCode);
+      codeRef.current.value = "";
+
+      /*const result = z.string().min(6).max(6).safeParse(roomCode);
+      if (!result.success) {
+        toast.error("Invalid room code", {
+          style: { borderRadius: "10px", background: "#333", color: "#fff" },
+        });
+        return;
+      }*/
+
+      setIsJoiningRoom(true);
+      void router.push(`/video/${roomCode}`);
+    }
   };
-
-  if (playerRef && playerRef.current) {
-    console.log(playerRef.current);
-  }
   return (
     <>
-      <ReactPlayer
-        playerRef={playerRef}
-        playing={playing}
-        url="/files/asdqwe.mp4"
-      />
-      <div>hi {playing}</div>
-      <button onClick={() => isPlaying(true)}>Boop</button>
-      <button onClick={() => isPlaying(false)}>Boop2</button>
-      <button
-        onClick={() => {
-          const frame = captureVideoFrame(
-            (playerRef as ReactPlayerProps).current?.getInternalPlayer()
-          );
-          console.log(frame);
-          if (frame) setImage(frame.dataUri);
-        }}
-      >
-        Boop3
-      </button>
-      {image && (
-        <div className="h-max w-max relative overflow-auto">
-          <Draggable bounds="parent" nodeRef={nodeRef} onDrag={handleDrag}>
-            <div ref={nodeRef} className="w-max">
-              I can be dragged anywhere {position.x} {position.y}
-            </div>
-          </Draggable>
-          <img src={image} width={640} height={360} />
-        </div>
-      )}
+      <div className="text-center font-mono text-3xl text-neutral-500 font-bold">
+        CATER INTERFACE
+      </div>
+      <div className="flex flex-col align-middle items-center gap-14 pt-48 font-mono">
+        <form onSubmit={handleSubmit}>
+          <div className="mx-auto flex max-w-[330px] justify-center gap-2">
+            <input
+              name="code"
+              id="code"
+              autoComplete="off"
+              placeholder="enter video code"
+              type="text"
+              className="input-bordered input w-full max-w-xs"
+              ref={codeRef}
+            />
+            <button
+              type="submit"
+              disabled={isJoiningRoom}
+              className={`h-10 w-12 place-items-center rounded-l-none`}
+            >
+              <FaArrowRight className="text-bg text-primary" />
+            </button>
+          </div>
+        </form>
+
+        <div className="font-bold text-xl">or</div>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const id = v4().slice(0, 6);
+            void router.push(`/processing/${id}`);
+          }}
+          className="flex flex-col align-middle items-center gap-2"
+        >
+          <div className="form-control w-full max-w-xs">
+            <label className="label">
+              <span className="label-text">Pick a file</span>
+              <span className="label-text-alt">MP4 Format</span>
+            </label>
+            <input
+              type="file"
+              className="file-input file-input-bordered w-full max-w-xs"
+            />
+          </div>
+          <button type="submit" className="btn btn-primary">Submit File</button>
+        </form>
+      </div>
     </>
   );
 }
