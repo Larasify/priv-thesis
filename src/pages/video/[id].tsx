@@ -10,7 +10,8 @@ import { ReactPlayerProps } from "react-player";
 import Draggable from "react-draggable";
 import clsx from "clsx";
 import toast from "react-hot-toast";
-import { FaPause, FaPlay } from "react-icons/fa";
+import { FaHome, FaPause, FaPlay } from "react-icons/fa";
+import { FaUpRightFromSquare } from "react-icons/fa6";
 
 const ReactPlayer = dynamic(() => import("../../helpers/ReactPlayerWrapper"), {
   ssr: false,
@@ -88,6 +89,15 @@ export default function VideoPage() {
 
   return (
     <>
+      <div
+        className="btn btn-neutral absolute bottom-4 right-4"
+        onClick={() => {
+          void router.push(`/`);
+        }}
+      >
+        <FaHome/>
+        Home
+      </div>
       <div className="flex flex-col align-middle items-center pt-4 font-mono">
         <div className="relative w-max h-max">
           <ReactPlayer
@@ -113,7 +123,7 @@ export default function VideoPage() {
           />
           <div
             className={clsx(
-              "w-12 h-12 text-teal-300 border-teal-300 border-4 p-4 absolute transition-all duration-150"
+              "w-12 h-12 border-red-500 border-4 p-4 absolute transition-all duration-150"
             )}
             style={{ left, top }}
           ></div>
@@ -124,7 +134,7 @@ export default function VideoPage() {
             Play
           </button>
           <button className="btn btn-neutral" onClick={() => isPlaying(false)}>
-            <FaPause/>
+            <FaPause />
             Pause
           </button>
           <button
@@ -142,6 +152,7 @@ export default function VideoPage() {
               }
             }}
           >
+            <FaUpRightFromSquare />
             Pop Frame
           </button>
         </div>
@@ -155,7 +166,11 @@ export default function VideoPage() {
         )}
         <div>{state.playedSeconds}</div>
         <div>{duration}</div>
-        <progress className="progress w-56" value={state.playedSeconds} max={duration}></progress>
+        <progress
+          className="progress w-56"
+          value={state.playedSeconds}
+          max={duration}
+        ></progress>
         <div>
           x: {currentPos.x} y: {currentPos.y}
         </div>
@@ -176,7 +191,7 @@ export default function VideoPage() {
                 >
                   <div
                     ref={nodeRef}
-                    className=" w-12 h-12 text-teal-300 border-teal-300 border-4 p-4"
+                    className=" w-12 h-12 border-red-500 border-4 p-4"
                   ></div>
                 </Draggable>
               </div>
