@@ -12,13 +12,32 @@ type Data = {
   }
 };
 //create a sample dataset of Data type with 10 elements
+let first_x = 320
+let first_y = 180
 const data: Data[] = [];
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 1100; i++) {
+  //randomly move the coordinates by 10 pixels dont go over 640x360
+
+  first_x = first_x + Math.floor(Math.random() * 30) - 15
+  first_y = first_y + Math.floor(Math.random() * 30) - 15
+  if (first_x > 640) {
+    first_x = 640
+  }
+  if (first_x < 0) {
+    first_x = 0
+  }
+  if (first_y > 360) {
+    first_y = 360
+  }
+  if (first_y < 0) {
+    first_y = 0
+  }
+
   data.push({
-    time: i,
+    time: i/8,
     coordinates: {
-      x: i,
-      y: i,
+      x: first_x,
+      y: first_y,
     },
   });
 }
