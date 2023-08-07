@@ -10,6 +10,7 @@ import { ReactPlayerProps } from "react-player";
 import Draggable from "react-draggable";
 import clsx from "clsx";
 import toast from "react-hot-toast";
+import { FaPause, FaPlay } from "react-icons/fa";
 
 const ReactPlayer = dynamic(() => import("../../helpers/ReactPlayerWrapper"), {
   ssr: false,
@@ -41,6 +42,7 @@ export default function VideoPage() {
   const nodeRef = React.useRef(null);
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [duration, setDuration] = useState(0);
 
   const [state, setState] = useState({
     playedSeconds: 0,
@@ -96,6 +98,9 @@ export default function VideoPage() {
             onPlay={() => isPlaying(true)}
             onPause={() => isPlaying(false)}
             progressInterval={125}
+            onDuration={(e) => {
+              setDuration(e);
+            }}
             onProgress={(e) => {
               console.log(e);
               setState({
@@ -115,9 +120,11 @@ export default function VideoPage() {
         </div>
         <div className="gap-2 px-4 py-4 flex flex-row">
           <button className="btn btn-neutral" onClick={() => isPlaying(true)}>
+            <FaPlay />
             Play
           </button>
           <button className="btn btn-neutral" onClick={() => isPlaying(false)}>
+            <FaPause/>
             Pause
           </button>
           <button
@@ -147,6 +154,8 @@ export default function VideoPage() {
           </div>
         )}
         <div>{state.playedSeconds}</div>
+        <div>{duration}</div>
+        <progress className="progress w-56" value={state.playedSeconds} max={duration}></progress>
         <div>
           x: {currentPos.x} y: {currentPos.y}
         </div>
