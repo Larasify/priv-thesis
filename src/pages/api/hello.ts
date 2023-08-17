@@ -24,8 +24,11 @@ export default function handler(
     files.push(file);
   });
 
+  var output = shell.exec('~/code/CATER/build/external/Build/cater/ui/cli/cater-cli track /home/larasify/Desktop/videocli/destination_output/now/results.yml');
+
+
   //return files array as json
-  res.status(200).json({ files: files })
+  res.status(200).json({ files: output })
 
   //res.status(200).json({ name: 'John Doe' })
 }

@@ -13,6 +13,7 @@ export default function Home() {
 
   const [isJoiningRoom, setIsJoiningRoom] = useState(false);
   const codeRef = useRef<HTMLInputElement>(null);
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -33,6 +34,28 @@ export default function Home() {
       void router.push(`/video/${roomCode}`);
     }
   };
+  const [file, setFile] = useState<File>();
+  const uploadFile = (e:React.FormEvent<HTMLFormElement>) =>{
+    e.preventDefault();
+    if(!file) return;
+    const id = v4().slice(0, 6);
+
+    //upload file to /api/upload
+    const formData = new FormData();
+    formData.append('media', file);
+    formData.append('id', id);
+
+    fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    }).then(res => res.json()).then(res => {
+      console.log(res);
+    }).catch(err => {
+      console.log(err);
+    })
+    
+    //void router.push(`/processing/${id}`);
+  }
   return (
     <>
       <div className="text-center font-mono text-3xl text-neutral-500 font-bold">
@@ -63,11 +86,7 @@ export default function Home() {
         <div className="font-bold text-xl">or</div>
 
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            const id = v4().slice(0, 6);
-            void router.push(`/processing/${id}`);
-          }}
+          onSubmit={uploadFile}
           className="flex flex-col align-middle items-center gap-2"
         >
           <div className="form-control w-full max-w-xs">
@@ -78,6 +97,12 @@ export default function Home() {
             <input
               type="file"
               className="file-input file-input-bordered w-full max-w-xs"
+              onChange={(e) => {
+                if (e.target.files) {
+                  setFile(e.target.files[0]);
+                }
+              }
+              }
             />
           </div>
           <button type="submit" className="btn btn-primary">Submit File</button>
