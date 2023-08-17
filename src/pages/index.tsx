@@ -6,7 +6,6 @@ import { FaArrowRight } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { z } from "zod";
 import { useRouter } from "next/router";
-import { v4 } from 'uuid';
 
 export default function Home() {
   const router = useRouter();
@@ -38,18 +37,19 @@ export default function Home() {
   const uploadFile = (e:React.FormEvent<HTMLFormElement>) =>{
     e.preventDefault();
     if(!file) return;
-    const id = v4().slice(0, 6);
 
     //upload file to /api/upload
     const formData = new FormData();
     formData.append('media', file);
-    formData.append('id', id);
+    let id = "";
 
     fetch('/api/upload', {
       method: 'POST',
       body: formData
     }).then(res => res.json()).then(res => {
       console.log(res);
+      id = res.id;
+      void router.push(`/processing/${id}`);
     }).catch(err => {
       console.log(err);
     })
