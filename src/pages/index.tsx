@@ -34,28 +34,31 @@ export default function Home() {
     }
   };
   const [file, setFile] = useState<File>();
-  const uploadFile = (e:React.FormEvent<HTMLFormElement>) =>{
+  const uploadFile = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if(!file) return;
+    if (!file) return;
 
     //upload file to /api/upload
     const formData = new FormData();
-    formData.append('media', file);
+    formData.append("media", file);
     let id = "";
 
-    fetch('/api/upload', {
-      method: 'POST',
-      body: formData
-    }).then(res => res.json()).then(res => {
-      console.log(res);
-      id = res.id;
-      void router.push(`/processing/${id}`);
-    }).catch(err => {
-      console.log(err);
+    fetch("/api/upload", {
+      method: "POST",
+      body: formData,
     })
-    
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        id = res.id;
+        void router.push(`/processing/${id}`);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
     //void router.push(`/processing/${id}`);
-  }
+  };
   return (
     <>
       <div className="text-center font-mono text-3xl text-neutral-500 font-bold">
@@ -101,11 +104,12 @@ export default function Home() {
                 if (e.target.files) {
                   setFile(e.target.files[0]);
                 }
-              }
-              }
+              }}
             />
           </div>
-          <button type="submit" className="btn btn-primary">Submit File</button>
+          <button type="submit" className="btn btn-primary">
+            Submit File
+          </button>
         </form>
       </div>
     </>

@@ -95,7 +95,7 @@ export default function VideoPage() {
           void router.push(`/`);
         }}
       >
-        <FaHome/>
+        <FaHome />
         Home
       </div>
       <div className="flex flex-col align-middle items-center pt-4 font-mono">
