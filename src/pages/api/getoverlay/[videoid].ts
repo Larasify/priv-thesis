@@ -1,56 +1,38 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { useRouter } from "next/router";
+import { parse, stringify } from "yaml";
 
-
-
-type Data = {
-  time : number
-  coordinates : {
-    x : number
-    y : number
-  }
+const readYaml = async (id: string) => {
+  const fs = require("fs");
+  const file = fs.readFileSync(
+    `/home/larasify/code/frames/${id}_output/now/detections.yml`,
+    "utf8"
+  );
+  const data = parse(file);
+  return data;
 };
-//create a sample dataset of Data type with 10 elements
-let first_x = 320
-let first_y = 180
-const data: Data[] = [];
-for (let i = 0; i < 3300; i++) {
-  //randomly move the coordinates by 10 pixels dont go over 640x360
 
-  first_x = first_x + Math.floor(Math.random() * 30) - 15
-  first_y = first_y + Math.floor(Math.random() * 30) - 15
-  if (first_x > 640) {
-    first_x = 640
-  }
-  if (first_x < 0) {
-    first_x = 0
-  }
-  if (first_y > 360) {
-    first_y = 360
-  }
-  if (first_y < 0) {
-    first_y = 0
-  }
+export type frame = {
+  frame_no: number;
+  position: number[];
+  theta: number;
+  theta_quality: number;
+  manually_set: boolean;
+};
 
-  data.push({
-    time: i/8,
-    coordinates: {
-      x: first_x,
-      y: first_y,
-    },
-  });
-}
-
-
-export default function getoverlay(
+export default async function getoverlay(
   req: NextApiRequest,
-  res: NextApiResponse<Data[]>
+  res: NextApiResponse<frame[]>
 ) {
   const { videoid } = req.query;
   console.log(videoid);
+  const data = await readYaml(videoid as string);
+  const frames: frame[] = data.detections;
+  //console.log(frames[0].position);
+
   //return files array as json
-  res.status(200).json(data);
+  res.status(200).json(frames);
 
   //res.status(200).json({ name: 'John Doe' })
 }

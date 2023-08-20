@@ -12,18 +12,21 @@ import clsx from "clsx";
 import toast from "react-hot-toast";
 import { FaHome, FaPause, FaPlay } from "react-icons/fa";
 import { FaUpRightFromSquare } from "react-icons/fa6";
+import { frame } from "../api/getoverlay/[videoid]";
 
 const ReactPlayer = dynamic(() => import("../../helpers/ReactPlayerWrapper"), {
   ssr: false,
 });
 
 export default function VideoPage() {
-  const [overlay, setOverlay] = React.useState([
-    { time: 0, coordinates: { x: 0, y: 0 } },
-    { time: 1, coordinates: { x: 0, y: 0 } },
-  ]);
+  const [overlay, setOverlay] = React.useState(new Array<frame>());
+
+  const router = useRouter();
+  const { id } = router.query;
+
   useEffect(() => {
-    fetch(`/api/getoverlay/12345`)
+    if (!id) return;
+    fetch(`/api/getoverlay/${id}`)
       .then((res) => res.json())
       .then((res) => {
         console.log(res);
@@ -32,10 +35,7 @@ export default function VideoPage() {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
-
-  const router = useRouter();
-  const { id } = router.query;
+  }, [id]);
 
   const [playing, isPlaying] = useState(false);
   const playerRef = useRef(null);
@@ -52,17 +52,31 @@ export default function VideoPage() {
     loadedSeconds: 0,
   });
 
-  const currentPos = useMemo(() => {
-    if (!overlay) return { x: 0, y: 0 };
+  const currentFrame = useMemo(() => {
+    if (overlay.length == 0) return 0;
     //get the xy for current time
-    const { playedSeconds } = state;
-    const {
-      coordinates: { x, y },
-    } =
-      overlay.find(({ time }) => time > playedSeconds) ||
-      overlay[overlay.length - 1];
+    const currentFrame = Math.floor(
+      (state.playedSeconds / duration) * overlay.length /*frame count*/
+    );
+    return currentFrame;
+  }, [overlay, state.playedSeconds, duration]);
+
+  const currentPos = useMemo(() => {
+    if (overlay.length == 0 || overlay.length <= currentFrame)
+      return { x: 0, y: 0 };
+    const videoWidth = (
+      playerRef as ReactPlayerProps
+    ).current?.getInternalPlayer().videoWidth;
+    const videoHeight = (
+      playerRef as ReactPlayerProps
+    ).current?.getInternalPlayer().videoHeight;
+    //get the xy for current time
+    const x = (overlay[currentFrame].position[0] * 1280) / videoWidth;
+    const y = (overlay[currentFrame].position[1] * 720) / videoHeight;
+
     return { x, y };
-  }, [overlay, state.playedSeconds]);
+  }, [overlay, currentFrame]);
+
   console.log(currentPos);
 
   const handleDrag = (e: any, ui: { deltaX: number; deltaY: number }) => {
@@ -82,8 +96,8 @@ export default function VideoPage() {
       (playerRef as ReactPlayerProps).current?.getInternalPlayer().currentTime
     );
   }
-  const left = currentPos.x;
-  const top = currentPos.y;
+  const left = currentPos.x - 24;
+  const top = currentPos.y - 24;
 
   const modalRef = useRef<HTMLDialogElement>(null);
 
@@ -105,9 +119,11 @@ export default function VideoPage() {
             playing={playing}
             url={`/files/${id}.mp4`}
             controls={true}
+            width={1280}
+            height={720}
             onPlay={() => isPlaying(true)}
             onPause={() => isPlaying(false)}
-            progressInterval={125}
+            progressInterval={41}
             onDuration={(e) => {
               setDuration(e);
             }}
@@ -123,7 +139,7 @@ export default function VideoPage() {
           />
           <div
             className={clsx(
-              "w-12 h-12 border-red-500 border-4 p-4 absolute transition-all duration-150"
+              "w-12 h-12 border-red-500 border-4 p-4 absolute transition-all"
             )}
             style={{ left, top }}
           ></div>
@@ -144,7 +160,6 @@ export default function VideoPage() {
               const frame = captureVideoFrame(
                 (playerRef as ReactPlayerProps).current?.getInternalPlayer()
               );
-              console.log(frame);
               if (frame) {
                 setImage(frame.dataUri);
 
@@ -174,8 +189,15 @@ export default function VideoPage() {
         <div>
           x: {currentPos.x} y: {currentPos.y}
         </div>
-        <div>Confidence: 22.5%</div>
+        <div>
+          Theta Quality:{" "}
+          {overlay.length != 0 && currentFrame < overlay.length
+            ? overlay[currentFrame].theta_quality
+            : 0}
+        </div>
+        <div>Frame:{currentFrame}</div>
 
+        {/*POPOUT MODAL FRAME*/}
         <dialog id="leaderboard_modal" className="modal" ref={modalRef}>
           <form method="dialog" className="modal-box max-w-4xl h-2/3">
             <div className="flex flex-col align-middle items-center">

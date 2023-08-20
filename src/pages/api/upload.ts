@@ -39,8 +39,8 @@ export default async function handler(
     var output = shell.exec(
       "ffmpeg -r 1 -i " +
         filepath +
-        ` -r 1 "/home/larasify/code/frames/${id}/img%03d.png"`
-    );
+        ` -r 1 "/home/larasify/code/frames/${id}/img%04d.png"`    );
+
     var output2 = shell.exec(
       `${cater_install_path} init /home/larasify/code/frames/${id}`
     );
@@ -48,7 +48,7 @@ export default async function handler(
       `${cater_install_path} track /home/larasify/code/frames/${id}_output/now/results.yml`
     );
     var output4 = shell.exec(
-      `${cater_install_path} pano --rows 100 --cols 2000 /home/larasify/code/frames/${id}_output/now/results.yml`
+      `${cater_install_path} pano --rows 4000 --cols 4000 /home/larasify/code/frames/${id}_output/now/results.yml`
     );
 
     res.status(200).json({ message: "success", id: id });
