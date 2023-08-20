@@ -47,9 +47,6 @@ export default async function handler(
     var output3 = shell.exec(
       `${cater_install_path} track /home/larasify/code/frames/${id}_output/now/results.yml`
     );
-    var output4 = shell.exec(
-      `${cater_install_path} pano --rows 4000 --cols 4000 /home/larasify/code/frames/${id}_output/now/results.yml`
-    );
 
     res.status(200).json({ message: "success", id: id });
   } catch (e) {

@@ -13,6 +13,9 @@ import toast from "react-hot-toast";
 import { FaHome, FaPause, FaPlay } from "react-icons/fa";
 import { FaUpRightFromSquare } from "react-icons/fa6";
 import { frame } from "../api/getoverlay/[videoid]";
+import { set } from "zod";
+import PanoramaButton from "../Components/PanoramaButton";
+import PopoutFrame from "../Components/PopoutFrame";
 
 const ReactPlayer = dynamic(() => import("../../helpers/ReactPlayerWrapper"), {
   ssr: false,
@@ -39,10 +42,7 @@ export default function VideoPage() {
 
   const [playing, isPlaying] = useState(false);
   const playerRef = useRef(null);
-  const [image, setImage] = useState(null);
-  const nodeRef = React.useRef(null);
 
-  const [position, setPosition] = useState({ x: 0, y: 0 });
   const [duration, setDuration] = useState(0);
 
   const [state, setState] = useState({
@@ -79,14 +79,6 @@ export default function VideoPage() {
 
   console.log(currentPos);
 
-  const handleDrag = (e: any, ui: { deltaX: number; deltaY: number }) => {
-    const { x, y } = position;
-    setPosition({
-      x: x + ui.deltaX,
-      y: y + ui.deltaY,
-    });
-  };
-
   if (
     playerRef &&
     playerRef.current &&
@@ -98,8 +90,6 @@ export default function VideoPage() {
   }
   const left = currentPos.x - 24;
   const top = currentPos.y - 24;
-
-  const modalRef = useRef<HTMLDialogElement>(null);
 
   return (
     <>
@@ -153,23 +143,19 @@ export default function VideoPage() {
             <FaPause />
             Pause
           </button>
-          <button
-            className="btn btn-neutral"
-            onClick={() => {
-              isPlaying(false);
-              const frame = captureVideoFrame(
-                (playerRef as ReactPlayerProps).current?.getInternalPlayer()
-              );
-              if (frame) {
-                setImage(frame.dataUri);
 
-                modalRef.current?.showModal();
-              }
-            }}
-          >
-            <FaUpRightFromSquare />
-            Pop Frame
-          </button>
+          {id && (
+            <PopoutFrame
+              playerRef={playerRef}
+              isPlaying={isPlaying}
+              state={{
+                playedSeconds: 0,
+              }}
+              id={id}
+            />
+          )}
+
+          {id && <PanoramaButton id={id} />}
         </div>
         {(playerRef as ReactPlayerProps).current?.getInternalPlayer() && (
           <div>
@@ -198,67 +184,6 @@ export default function VideoPage() {
         <div>Frame:{currentFrame}</div>
 
         {/*POPOUT MODAL FRAME*/}
-        <dialog id="leaderboard_modal" className="modal" ref={modalRef}>
-          <form method="dialog" className="modal-box max-w-4xl h-2/3">
-            <div className="flex flex-col align-middle items-center">
-              <div className="h-[360px] w-[640px] relative overflow-hidden">
-                {image && (
-                  <img src={image} className="w-[640px] h-[360px]" alt="hey" />
-                )}
-                <Draggable
-                  defaultPosition={{ x: 0, y: -360 }}
-                  bounds="parent"
-                  nodeRef={nodeRef}
-                  onDrag={handleDrag}
-                >
-                  <div
-                    ref={nodeRef}
-                    className=" w-12 h-12 border-red-500 border-4 p-4"
-                  ></div>
-                </Draggable>
-              </div>
-              <span className="bold">
-                {" "}
-                {position.x} {position.y}
-              </span>
-              <button
-                className="btn btn-primary"
-                onClick={() => {
-                  fetch(`/api/postfixedframe`, {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                      id: id,
-                      time: state.playedSeconds,
-                      coordinates: position,
-                    }),
-                  })
-                    .then((res) => res.json())
-                    .then((res) => {
-                      console.log(res);
-                      toast.success("Successfully Fixed Frame", {
-                        style: {
-                          borderRadius: "10px",
-                          background: "#333",
-                          color: "#fff",
-                        },
-                      });
-                    })
-                    .catch((err) => {
-                      console.log(err);
-                    });
-                }}
-              >
-                Send Fixed Frame
-              </button>
-            </div>
-          </form>
-          <form method="dialog" className="modal-backdrop">
-            <button>close</button>
-          </form>
-        </dialog>
       </div>
     </>
   );
