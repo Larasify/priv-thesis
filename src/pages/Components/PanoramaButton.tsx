@@ -37,7 +37,7 @@ export default function PanoramaButton(props: { id: string | string[] }) {
           disabled={generatingPanorama}
           onClick={() => {
             setGeneratingPanorama(true);
-            fetch("/api/generatepanorama", {
+            fetch("/api/generatepanorama2", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
