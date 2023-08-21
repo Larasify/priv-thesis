@@ -15,9 +15,12 @@ export default async function generatepanorama(
   var shell = require("shelljs");
 
   var output4 = shell.exec(
-    `${cater_install_path} pano --rows 4000 --cols 4000 /home/larasify/code/frames/${id}_output/now/results.yml`
-    , { async: true }
+    `${cater_install_path} pano --rows 4000 --cols 4000 /home/larasify/code/frames/${id}_output/now/results.yml`,
+    { async: true }, { silent: true}
   );
-
+  output4.stdout.on("data", function (data: any) { 
+    console.log("hi: "+data);
+  });
+  
   res.status(200).json({ message: "success" });
 }
