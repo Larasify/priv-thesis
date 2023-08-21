@@ -23,6 +23,7 @@ const ReactPlayer = dynamic(() => import("../../helpers/ReactPlayerWrapper"), {
 
 export default function VideoPage() {
   const [overlay, setOverlay] = React.useState(new Array<frame>());
+  const [loadingOverlay, setLoadingOverlay] = React.useState(true);
 
   const router = useRouter();
   const { id } = router.query;
@@ -34,6 +35,7 @@ export default function VideoPage() {
       .then((res) => {
         console.log(res);
         setOverlay(res);
+        setLoadingOverlay(false);
       })
       .catch((err) => {
         console.log(err);
@@ -43,7 +45,7 @@ export default function VideoPage() {
   const [playing, isPlaying] = useState(false);
   const playerRef = useRef(null);
 
-  const [duration, setDuration] = useState(0);
+  const [duration, setDuration] = useState(1);
 
   const [state, setState] = useState({
     playedSeconds: 0,
@@ -53,17 +55,16 @@ export default function VideoPage() {
   });
 
   const currentFrame = useMemo(() => {
-    if (overlay.length == 0) return 0;
+    if (loadingOverlay) return 0;
     //get the xy for current time
     const currentFrame = Math.floor(
       (state.playedSeconds / duration) * overlay.length /*frame count*/
     );
     return currentFrame;
-  }, [overlay, state.playedSeconds, duration]);
+  }, [overlay, state.playedSeconds, duration, loadingOverlay]);
 
   const currentPos = useMemo(() => {
-    if (overlay.length == 0 || overlay.length <= currentFrame)
-      return { x: 0, y: 0 };
+    if (loadingOverlay || overlay.length <= currentFrame) return { x: 0, y: 0 };
     const videoWidth = (
       playerRef as ReactPlayerProps
     ).current?.getInternalPlayer().videoWidth;
@@ -75,9 +76,15 @@ export default function VideoPage() {
     const y = (overlay[currentFrame].position[1] * 720) / videoHeight;
 
     return { x, y };
-  }, [overlay, currentFrame]);
+  }, [overlay, currentFrame, loadingOverlay]);
 
-  console.log(currentPos);
+  if (loadingOverlay) {
+    return (
+      <div className="flex flex-col align-middle items-center pt-4 font-mono">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
 
   if (
     playerRef &&
