@@ -37,6 +37,12 @@ export default function Home() {
   const uploadFile = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!file) return;
+    if (file.type !== "video/mp4") {
+      toast.error("Invalid file type", {
+        style: { borderRadius: "10px", background: "#333", color: "#fff" },
+      });
+      return;
+    }
 
     //upload file to /api/upload
     const formData = new FormData();

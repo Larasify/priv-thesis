@@ -16,6 +16,7 @@ import { frame } from "../api/getoverlay/[videoid]";
 import { set } from "zod";
 import PanoramaButton from "../Components/PanoramaButton";
 import PopoutFrame from "../Components/PopoutFrame";
+import FixedFrameList from "../Components/FixedFrameList";
 
 const ReactPlayer = dynamic(() => import("../../helpers/ReactPlayerWrapper"), {
   ssr: false,
@@ -152,7 +153,7 @@ export default function VideoPage() {
           </button>
 
           {id && (
-            <PopoutFrame
+            <FixedFrameList
               playerRef={playerRef}
               isPlaying={isPlaying}
               state={{

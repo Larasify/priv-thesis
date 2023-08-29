@@ -39,7 +39,7 @@ export default async function handler(
     var output = shell.exec(
       "ffmpeg -r 1 -i " +
         filepath +
-        ` -r 1 "/home/larasify/code/frames/${id}/img%04d.png"`
+        ` -r 1 "/home/larasify/code/frames/${id}/img%05d.png"`
     );
 
     var output2 = shell.exec(
