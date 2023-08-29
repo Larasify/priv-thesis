@@ -10,19 +10,22 @@ import { ReactPlayerProps } from "react-player";
 import Draggable from "react-draggable";
 import clsx from "clsx";
 import toast from "react-hot-toast";
-import { FaHome, FaPause, FaPlay } from "react-icons/fa";
+import { FaHome, FaPause, FaPlay, FaTrash } from "react-icons/fa";
 import { FaUpRightFromSquare } from "react-icons/fa6";
-import { frame } from "../api/getoverlay/[videoid]";
 import { set } from "zod";
 import PanoramaButton from "../Components/PanoramaButton";
+
+type fixedFrame = {
+  frame: number;
+  x: number;
+  y: number;
+};
 
 export default function FixedFrameList(props: {
   playerRef: ReactPlayerProps;
   isPlaying: Dispatch<React.SetStateAction<boolean>>;
-  state: {
-    playedSeconds: number;
-  };
   id: string | string[];
+  currentFrame: number;
 }) {
   const [image, setImage] = useState(null);
   const nodeRef = React.useRef(null);
@@ -31,7 +34,6 @@ export default function FixedFrameList(props: {
 
   const playerRef = props.playerRef;
   const isPlaying = props.isPlaying;
-  const state = props.state;
   const id = props.id;
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -44,9 +46,7 @@ export default function FixedFrameList(props: {
     });
   };
 
-  const [FrameList, setFrameList] = useState([
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-  ]);
+  const [FrameList, setFrameList] = useState(new Array<fixedFrame>());
 
   return (
     <>
@@ -70,45 +70,88 @@ export default function FixedFrameList(props: {
 
       <dialog id="leaderboard_modal" className="modal" ref={modalRef}>
         <form method="dialog" className="modal-box max-w-full h-full">
-          <div className="flex flex-col align-middle items-center">
-            <div className="flex flex-row jusify gap-8">
-              <div className="border-neutral-500 border-2 p-4 rounded-2xl items-center overflow-y-scroll h-[720px] overflow-x-hidden">
+          <div className="flex flex-col align-middle">
+            <div className="flex gap-8">
+              <div className="border-neutral-500 border-2 p-4 rounded-2xl items-center overflow-y-scroll h-[720px] w-1/6 overflow-x-hidden">
                 {FrameList.map((object, i) => {
                   return (
                     <div
                       key={i}
-                      className="collapse collapse-arrow border-2 border-neutral-500 w-36 my-2"
+                      className="collapse collapse-arrow border-2 border-neutral-500 w-full my-2"
                     >
-                      <input
-                        type="radio"
-                        name="my-accordion-2"
-                      />
+                      <input type="radio" name="my-accordion-2" />
                       <div className="collapse-title text-xl font-medium">
-                        {object}
+                        {object.frame}
                       </div>
-                      <div className="collapse-content">
-                        <p>hello</p>
+                      <div className="collapse-content text-sm">
+                        <div className="flex flex-col justify-between">
+                          <p>Previous Coord: 6 9</p>
+                          <p>
+                            Fixed Coord: {object.x} {object.y}
+                          </p>
+                          <div className="btn btn-primary btn-sm w-24">
+                            Show Frame
+                          </div>
+                          <div className="flex justify-end">
+                            <div onClick={() => {
+                                const newFrameList = FrameList.filter((item) => item.frame != object.frame);
+                                setFrameList(newFrameList);
+                            }}>
+                              <FaTrash className="text-red-700 hover:text-red-500" />
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   );
                 })}
               </div>
-              <div className="h-[720px] w-[1280px] relative overflow-hidden">
-                {image && (
-                  <img src={image} className="w-[1280px] h-[720px]" alt="hey" />
-                )}
-                <Draggable
-                  defaultPosition={{ x: -24, y: -744 }}
-                  bounds="parent"
-                  nodeRef={nodeRef}
-                  onDrag={handleDrag}
-                >
-                  <div
-                    ref={nodeRef}
-                    className=" w-12 h-12 border-red-500 border-4 p-4"
-                  ></div>
-                </Draggable>
-              </div>
+              {image && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={image}
+                  onClick={(e) => {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const naturalWidth = e.currentTarget.naturalWidth;
+                    const naturalHeight = e.currentTarget.naturalHeight;
+                    var xCoord = Math.round(
+                      ((e.clientX - rect.left) / (rect.right - rect.left)) *
+                        naturalWidth
+                    );
+                    var yCoord = Math.round(
+                      ((e.clientY - rect.top) / (rect.bottom - rect.top)) *
+                        naturalHeight
+                    );
+                    if (xCoord < 0) {
+                      xCoord = 0;
+                    }
+                    if (yCoord < 0) {
+                      yCoord = 0;
+                    }
+                    //if currentFrame in FrameList, toast error
+                    for (let i = 0; i < FrameList.length; i++) {
+                      if (FrameList[i].frame == props.currentFrame) {
+                        toast.error("Frame already fixed", {
+                          style: {
+                            borderRadius: "10px",
+                            background: "#333",
+                            color: "#fff",
+                          },
+                        });
+                        return;
+                      }
+                    }
+                    FrameList.push({
+                      frame: props.currentFrame,
+                      x: xCoord,
+                      y: yCoord,
+                    });
+                    setPosition({ x: xCoord, y: yCoord });
+                  }}
+                  className="w-[1280px] h-[720px]"
+                  alt="hey"
+                />
+              )}
             </div>
             <span className="bold">
               {" "}
@@ -118,6 +161,7 @@ export default function FixedFrameList(props: {
             <button
               className="btn btn-primary"
               onClick={() => {
+                /*
                 fetch(`/api/postfixedframe`, {
                   method: "POST",
                   headers: {
@@ -143,6 +187,7 @@ export default function FixedFrameList(props: {
                   .catch((err) => {
                     console.log(err);
                   });
+                  */
               }}
             >
               Send Fixed Frame

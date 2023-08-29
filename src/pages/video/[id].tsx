@@ -156,10 +156,8 @@ export default function VideoPage() {
             <FixedFrameList
               playerRef={playerRef}
               isPlaying={isPlaying}
-              state={{
-                playedSeconds: 0,
-              }}
               id={id}
+              currentFrame={currentFrame}
             />
           )}
 
