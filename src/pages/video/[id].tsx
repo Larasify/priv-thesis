@@ -3,19 +3,14 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import dynamic from "next/dynamic";
 
-import captureVideoFrame from "../../helpers/capturevideoframe";
 
 import { ReactPlayerProps } from "react-player";
 
-import Draggable from "react-draggable";
 import clsx from "clsx";
-import toast from "react-hot-toast";
 import { FaHome, FaPause, FaPlay } from "react-icons/fa";
 import { FaUpRightFromSquare } from "react-icons/fa6";
 import { frame } from "../api/getoverlay/[videoid]";
-import { set } from "zod";
 import PanoramaButton from "../Components/PanoramaButton";
-import PopoutFrame from "../Components/PopoutFrame";
 import FixedFrameList from "../Components/FixedFrameList";
 
 const ReactPlayer = dynamic(() => import("../../helpers/ReactPlayerWrapper"), {
@@ -25,6 +20,7 @@ const ReactPlayer = dynamic(() => import("../../helpers/ReactPlayerWrapper"), {
 export default function VideoPage() {
   const [overlay, setOverlay] = React.useState(new Array<frame>());
   const [loadingOverlay, setLoadingOverlay] = React.useState(true);
+  const [testimage, setTestImage] = React.useState("");
 
   const router = useRouter();
   const { id } = router.query;
@@ -41,6 +37,25 @@ export default function VideoPage() {
       .catch((err) => {
         console.log(err);
       });
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    fetch("/api/getimage", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+        frame: 999,
+      }),
+    }).then(async (res) => {
+      console.log(res);
+      const img = await res.blob();
+      setTestImage(URL.createObjectURL(img));
+    }
+    );
   }, [id]);
 
   const [playing, isPlaying] = useState(false);
@@ -110,6 +125,7 @@ export default function VideoPage() {
         <FaHome />
         Home
       </div>
+      <img src={testimage} alt="a" />
       <div className="flex flex-col align-middle items-center pt-4 font-mono">
         <div className="relative w-max h-max">
           <ReactPlayer

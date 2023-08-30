@@ -8,6 +8,7 @@ export default async function generatepanorama(
     res.status(405).send({ message: "Only POST requests allowed" });
     return;
   }
+  console.log(req.body);
   const id = req.body.id;
   console.log(id);
   var shell = require("shelljs");

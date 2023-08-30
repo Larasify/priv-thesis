@@ -1,19 +1,16 @@
 import { useRouter } from "next/router";
 import React, { Dispatch, useEffect, useMemo, useRef, useState } from "react";
 
-import dynamic from "next/dynamic";
 
 import captureVideoFrame from "../../helpers/capturevideoframe";
 
 import { ReactPlayerProps } from "react-player";
 
-import Draggable from "react-draggable";
-import clsx from "clsx";
 import toast from "react-hot-toast";
 import { FaHome, FaPause, FaPlay, FaTrash } from "react-icons/fa";
 import { FaUpRightFromSquare } from "react-icons/fa6";
-import { set } from "zod";
-import PanoramaButton from "../Components/PanoramaButton";
+
+
 
 type fixedFrame = {
   frame: number;
@@ -38,13 +35,6 @@ export default function FixedFrameList(props: {
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const handleDrag = (e: any, ui: { deltaX: number; deltaY: number }) => {
-    const { x, y } = position;
-    setPosition({
-      x: x + ui.deltaX,
-      y: y + ui.deltaY,
-    });
-  };
 
   const [FrameList, setFrameList] = useState(new Array<fixedFrame>());
 
