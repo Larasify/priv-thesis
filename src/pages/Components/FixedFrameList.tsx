@@ -120,7 +120,12 @@ export default function FixedFrameList(props: {
                           <p>
                             Fixed Coord: {object.x} {object.y}
                           </p>
-                          <div className="btn btn-primary btn-sm w-24">
+                          <div
+                            className="btn btn-primary btn-sm w-24"
+                            onClick={() => {
+                              setModalCurrentFrame(object.frame);
+                            }}
+                          >
                             Show Frame
                           </div>
                           <div className="flex justify-end">
@@ -236,6 +241,58 @@ export default function FixedFrameList(props: {
                   )}
                 </div>
               )}
+            </div>
+            <div className="relative w-max">
+              <input
+                type="number"
+                name="frameInput"
+                id="frameInput"
+                className="input w-48 pl-8 border-neutral-500 border-2"
+                max={props.overlay.length - 1}
+                placeholder={modalCurrentFrame.toString()}
+                onKeyDown={(e) => {
+                  if (e.key == "Enter") {
+                    e.preventDefault();
+                    if (
+                      (e.target as HTMLInputElement).value == "" ||
+                      (e.target as HTMLInputElement).value == null
+                    )
+                      return;
+                    if (
+                      parseInt((e.target as HTMLInputElement).value) < 0 ||
+                      parseInt((e.target as HTMLInputElement).value) >
+                        props.overlay.length - 1
+                    ) {
+                      return;
+                    }
+                    setModalCurrentFrame(
+                      parseInt((e.target as HTMLInputElement).value)
+                    );
+                  }
+                }}
+                onKeyUp={(e) => {
+                  //if more than max set to max
+                  if (
+                    parseInt((e.target as HTMLInputElement).value) >
+                    props.overlay.length - 1
+                  ) {
+                    (e.target as HTMLInputElement).value = (
+                      props.overlay.length - 1
+                    ).toString();
+                  }
+                  //if less than zero set to zero
+                  if (
+                    parseInt((e.target as HTMLInputElement).value) < 0 ||
+                    (e.target as HTMLInputElement).value == "" ||
+                    (e.target as HTMLInputElement).value == null
+                  ) {
+                    (e.target as HTMLInputElement).value = "0";
+                  }
+                }}
+              />
+              <span className="absolute right-12 top-3">
+                / {props.overlay.length - 1}
+              </span>
             </div>
             <span className="bold">
               {" "}

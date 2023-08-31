@@ -30,7 +30,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   fs.readFile(imagePath, (err, data) => {
     if (err) {
-      res.status(404).end();
+      res.status(500).end();
       return;
     }
 
