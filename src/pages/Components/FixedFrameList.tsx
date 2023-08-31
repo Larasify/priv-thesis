@@ -34,6 +34,7 @@ export default function FixedFrameList(props: {
   const id = props.id;
 
   const modalImgRef = useRef<HTMLImageElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [FrameList, setFrameList] = useState(new Array<fixedFrame>());
 
@@ -63,6 +64,7 @@ export default function FixedFrameList(props: {
 
   useEffect(() => {
     getCurrentImage(id as string, modalCurrentFrame + 1);
+    if (inputRef.current) inputRef.current.value = modalCurrentFrame.toString();
   }, [modalCurrentFrame]);
 
   const currentFixedFrameCoords = useMemo(() => {
@@ -233,7 +235,8 @@ export default function FixedFrameList(props: {
                           setFrameList([...FrameList, newFrame]);
                         }
                         if (nextFrameOnClick) {
-                          setModalCurrentFrame(modalCurrentFrame + 1);
+                          if (modalCurrentFrame + 1 < props.overlay.length)
+                            setModalCurrentFrame(modalCurrentFrame + 1);
                         }
                         /*FrameList.push({
                           frame: modalCurrentFrame,
@@ -293,6 +296,7 @@ export default function FixedFrameList(props: {
                       id="frameInput"
                       className="input w-48 pl-8 border-neutral-500 border-2"
                       max={props.overlay.length - 1}
+                      ref={inputRef}
                       placeholder={modalCurrentFrame.toString()}
                       onKeyDown={(e) => {
                         if (e.key == "Enter") {
