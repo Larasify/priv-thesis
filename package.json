@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "node src/helpers/testrequirements.js"
+    "test": "node src/helpers/testing/testrequirements.js"
   },
   "dependencies": {
     "@types/node": "20.4.5",
