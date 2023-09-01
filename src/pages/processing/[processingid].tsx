@@ -13,7 +13,8 @@ export default function Processing() {
       <div className="loading loading-lg text-primary"></div>
       <div className=" font-mono text-neutral-500 font-bold">
         Your video is processing please wait for it to be processed and then
-        access with your id-code
+        access with your id-code. This may take upwards of 40 minutes depending
+        on the length of your video.
         <span className="loading loading-dots loading-xs"></span>
       </div>
       <Link href="/">
