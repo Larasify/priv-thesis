@@ -23,7 +23,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   const imgName = "img" + frame.toString().padStart(5, "0") + ".png";
 
   const imagePath = path.join(
-    `/home/larasify/code/frames/${id}/`,
+    `${process.env.FRAMES_PATH}/${id}/`,
     imgName
   );
   console.log(imagePath);

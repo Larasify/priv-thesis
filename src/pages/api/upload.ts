@@ -32,21 +32,19 @@ export default async function handler(
     //console.log(files);
     //console.log(files.media[0].filepath);
     const filepath = files.media[0].filepath;
-    const cater_install_path =
-      "~/code/CATER/build/external/Build/cater/ui/cli/cater-cli";
     var shell = require("shelljs");
-    shell.mkdir(`/home/larasify/code/frames/${id}`);
+    shell.mkdir(`${process.env.FRAMES_PATH}/${id}`);
     var output = shell.exec(
       "ffmpeg -r 1 -i " +
         filepath +
-        ` -r 1 "/home/larasify/code/frames/${id}/img%05d.png"`
+        ` -r 1 "${process.env.FRAMES_PATH}/${id}/img%05d.png"`
     );
 
     var output2 = shell.exec(
-      `${cater_install_path} init /home/larasify/code/frames/${id}`
+      `${process.env.CATER_PATH} init ${process.env.FRAMES_PATH}/${id}`
     );
     var output3 = shell.exec(
-      `${cater_install_path} track /home/larasify/code/frames/${id}_output/now/results.yml`
+      `${process.env.CATER_PATH} track ${process.env.FRAMES_PATH}/${id}_output/now/results.yml`
     );
 
     res.status(200).json({ message: "success", id: id });

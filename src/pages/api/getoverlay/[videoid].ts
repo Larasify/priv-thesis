@@ -6,7 +6,7 @@ import { parse, stringify } from "yaml";
 const readYaml = async (id: string) => {
   const fs = require("fs");
   const file = fs.readFileSync(
-    `/home/larasify/code/frames/${id}_output/now/detections.yml`,
+    `${process.env.FRAMES_PATH}/${id}_output/now/detections.yml`,
     "utf8"
   );
   const data = parse(file);

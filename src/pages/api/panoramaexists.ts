@@ -15,7 +15,7 @@ export default async function generatepanorama(
 
   var output = shell.cp(
     `-u`,
-    `/home/larasify/code/frames/${id}_output/now/panorama/pano2_opt_dense.png`,
+    `${process.env.FRAMES_PATH}/${id}_output/now/panorama/pano2_opt_dense.png`,
     `/home/larasify/code/priv-thesis/public/files/panorama/${id}.png`
   );
   //check if file exists
