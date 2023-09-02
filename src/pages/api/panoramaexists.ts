@@ -13,10 +13,12 @@ export default async function generatepanorama(
   console.log(id);
   var shell = require("shelljs");
 
+  shell.mkdir("-p",`./public/panorama/`);
+
   var output = shell.cp(
     `-u`,
     `${process.env.FRAMES_PATH}/${id}_output/now/panorama/pano2_opt_dense.png`,
-    `/home/larasify/code/priv-thesis/public/files/panorama/${id}.png`
+    `${process.env.BUILD_PATH}/public/files/panorama/${id}.png`
   );
   //check if file exists
   if (output.code !== 0) {

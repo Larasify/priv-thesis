@@ -55,6 +55,7 @@ export default function VideoPage() {
     const currentFrame = Math.floor(
       (state.playedSeconds / duration) * overlay.length /*frame count*/
     );
+    if (currentFrame >= overlay.length) return overlay.length - 1;
     return currentFrame;
   }, [overlay, state.playedSeconds, duration, loadingOverlay]);
 

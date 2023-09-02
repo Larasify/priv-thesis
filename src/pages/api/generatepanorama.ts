@@ -9,13 +9,10 @@ export default async function generatepanorama(
     return;
   }
   const id = req.body.id;
-  console.log(id);
-  const cater_install_path =
-    "~/code/CATER/build/external/Build/cater/ui/cli/cater-cli";
   var shell = require("shelljs");
 
   var output4 = shell.exec(
-    `${cater_install_path} pano --rows 4000 --cols 4000 /home/larasify/code/frames/${id}_output/now/results.yml`,
+    `${process.env.CATER_PATH} pano --rows 4000 --cols 4000 ${process.env.FRAMES_PATH}/${id}_output/now/results.yml`,
     { async: true }, { silent: true}
   );
   output4.stdout.on("data", function (data: any) { 
