@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import { ReactPlayerProps } from "react-player";
 
 import clsx from "clsx";
-import { FaHome, FaPause, FaPlay } from "react-icons/fa";
+import { FaHome, FaPause, FaPlay, FaTrash } from "react-icons/fa";
 import { FaUpRightFromSquare } from "react-icons/fa6";
 import { frame } from "../api/getoverlay/[videoid]";
 import PanoramaButton from "../Components/PanoramaButton";
@@ -19,12 +19,57 @@ const ReactPlayer = dynamic(() => import("../../helpers/ReactPlayerWrapper"), {
 export default function VideoPage() {
   const [overlay, setOverlay] = React.useState(new Array<frame>());
   const [loadingOverlay, setLoadingOverlay] = React.useState(true);
+  const [panoramaExists, setPanoramaExists] = React.useState(false);
+  const [videoExists, setVideoExists] = React.useState(false);
 
   const router = useRouter();
   const { id } = router.query;
 
   useEffect(() => {
     if (!id) return;
+    fetch("/api/videoexists", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+      }),
+    }).then(async (res) => {
+      console.log(res);
+      if (res.status == 200) {
+        console.log("video exists");
+        setVideoExists(true);
+      } else {
+        await router.push(`/404`);
+      }
+    });
+  }, [id]);
+
+  useEffect(() => {
+    fetch(`/api/panoramaexists`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        //check if res code 200
+        if (res.message.includes("png")) {
+          setPanoramaExists(true);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [id]);
+
+  useEffect(() => {
+    if (!id || !videoExists) return;
     fetch(`/api/getoverlay/${id}`)
       .then((res) => res.json())
       .then((res) => {
@@ -34,8 +79,9 @@ export default function VideoPage() {
       })
       .catch((err) => {
         console.log(err);
+        router.push(`/processing/${id}`);
       });
-  }, [id]);
+  }, [id, videoExists]);
 
   const [playing, isPlaying] = useState(false);
   const playerRef = useRef(null);
@@ -60,7 +106,8 @@ export default function VideoPage() {
   }, [overlay, state.playedSeconds, duration, loadingOverlay]);
 
   const currentPos = useMemo(() => {
-    if (loadingOverlay || overlay.length <= currentFrame) return { x: 0, y: 0 };
+    if (loadingOverlay || overlay.length <= currentFrame || !playerRef.current)
+      return { x: 0, y: 0 };
     const videoWidth = (
       playerRef as ReactPlayerProps
     ).current?.getInternalPlayer().videoWidth;
@@ -106,38 +153,102 @@ export default function VideoPage() {
         Home
       </div>
       <div className="flex flex-col align-middle items-center pt-4 font-mono">
-        <div className="relative w-max h-max">
-          <ReactPlayer
-            playerRef={playerRef}
-            playing={playing}
-            url={`/files/${id}.mp4`}
-            controls={true}
-            width={1280}
-            height={720}
-            onPlay={() => isPlaying(true)}
-            onPause={() => isPlaying(false)}
-            progressInterval={41}
-            onDuration={(e) => {
-              setDuration(e);
-            }}
-            onProgress={(e) => {
-              console.log(e);
-              setState({
-                playedSeconds: e.playedSeconds,
-                played: e.played,
-                loaded: e.loaded,
-                loadedSeconds: e.loadedSeconds,
-              });
-            }}
-          />
-          <div
-            className={clsx(
-              "w-12 h-12 border-red-500 border-4 p-4 absolute transition-all"
+        <div className="flex flex-row gap-2 ">
+          <div className="relative w-max h-max">
+            <ReactPlayer
+              playerRef={playerRef}
+              playing={playing}
+              url={`/files/${id}.mp4`}
+              controls={true}
+              width={1280}
+              height={720}
+              onPlay={() => isPlaying(true)}
+              onPause={() => isPlaying(false)}
+              progressInterval={41}
+              onDuration={(e) => {
+                setDuration(e);
+              }}
+              onProgress={(e) => {
+                console.log(e);
+                setState({
+                  playedSeconds: e.playedSeconds,
+                  played: e.played,
+                  loaded: e.loaded,
+                  loadedSeconds: e.loadedSeconds,
+                });
+              }}
+            />
+            {(currentPos.x != 0 || currentPos.y != 0) && (
+              <div
+                className={clsx(
+                  "w-12 h-12 border-red-500 border-4 p-4 absolute transition-all"
+                )}
+                style={{ left, top }}
+              ></div>
             )}
-            style={{ left, top }}
-          ></div>
+          </div>
+          <div className="border-neutral-500 border-2 p-4 rounded-2xl h-[720px] font-semibold text-neutral-400 flex flex-col gap-4 tracking-wide">
+            <div className="border-neutral-500 border-b-2">Information</div>
+            <div className="flex flex-col">
+              Frame Count:{" "}
+              <span>
+                {currentFrame}/{overlay.length - 1}
+              </span>
+            </div>
+
+            <div className="flex flex-col">
+              Theta Quality:
+              <span>
+                {overlay.length != 0 && currentFrame < overlay.length
+                  ? overlay[currentFrame].theta_quality.toFixed(2)
+                  : 0}
+              </span>
+            </div>
+
+            <div className="flex flex-col">
+              Video Duration:{" "}
+              <span>
+                {state.playedSeconds.toFixed(2)}/{duration}s{" "}
+              </span>
+            </div>
+
+            <progress
+              className="progress w-56 progress-success"
+              value={state.playedSeconds}
+              max={duration}
+            ></progress>
+            <div className="flex flex-col">
+              Video coordinates:{" "}
+              <span>
+                x:{currentPos.x.toFixed(0)} y:{currentPos.y.toFixed(0)}
+              </span>
+            </div>
+            <div className="flex flex-col">
+              Overlay coordinates:{" "}
+              <span>
+                x:{overlay[currentFrame].position[0]} y:
+                {overlay[currentFrame].position[1]}
+              </span>
+            </div>
+            <div>
+              Panorama:{" "}
+              {panoramaExists ? (
+                <span className=" text-green-500">Ready</span>
+              ) : (
+                <span className=" text-red-500">Not Ready</span>
+              )}
+            </div>
+            <div>
+              Overlay:{" "}
+              {overlay.length !== 0 ? (
+                <span className=" text-green-500">Ready</span>
+              ) : (
+                <span className=" text-red-500">Not Ready</span>
+              )}
+            </div>
+          </div>
         </div>
-        <div className="gap-2 px-4 py-4 flex flex-row">
+        <div className="gap-4 px-4 py-4 flex flex-row w-max">
           <button className="btn btn-neutral" onClick={() => isPlaying(true)}>
             <FaPlay />
             Play
@@ -158,36 +269,47 @@ export default function VideoPage() {
           )}
 
           {id && <PanoramaButton id={id} />}
+
+          <button
+            onClick={() => {
+              function Confirm() {
+                var x;
+                if (
+                  confirm(
+                    "Are you sure you wish to delete this video and all the proccessing data generated?"
+                  ) == true
+                ) {
+                  fetch(`/api/deletevideo/${id}`, {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      id: id,
+                    }),
+                  }).then(async (res) => {
+                    console.log(res);
+                    if (res.status == 200) {
+                      console.log("video deleted");
+
+                      await router.push(`/`);
+                    } else {
+                      await router.push(`/404`);
+                    }
+                  });
+                } else {
+                }
+              }
+              return Confirm();
+            }}
+            className="group btn hover:bg-red-700 btn-neutral "
+          >
+            <span className="text-red-700 group-hover:text-neutral-400">
+              <FaTrash />
+            </span>
+            Delete Video
+          </button>
         </div>
-        {(playerRef as ReactPlayerProps).current?.getInternalPlayer() && (
-          <div>
-            {
-              (playerRef as ReactPlayerProps).current?.getInternalPlayer()
-                .currentTime
-            }
-          </div>
-        )}
-        <div>{state.playedSeconds}</div>
-        <div>{duration}</div>
-        <progress
-          className="progress w-56"
-          value={state.playedSeconds}
-          max={duration}
-        ></progress>
-        <div>
-          video: x: {currentPos.x} y: {currentPos.y}
-        </div>
-        <div>
-          overlay: x: {overlay[currentFrame].position[0]} y:
-          {overlay[currentFrame].position[1]}
-        </div>
-        <div>
-          Theta Quality:{" "}
-          {overlay.length != 0 && currentFrame < overlay.length
-            ? overlay[currentFrame].theta_quality
-            : 0}
-        </div>
-        <div>Frame:{currentFrame}</div>
 
         {/*POPOUT MODAL FRAME*/}
       </div>
