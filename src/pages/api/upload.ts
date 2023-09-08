@@ -32,9 +32,7 @@ export default async function handler(
     //console.log(files.media[0].filepath);
     const filepath = files.media[0].filepath;
 
-    run_processing(id, filepath).then(() => {
-      console.log("done");
-    });
+    run_processing(id, filepath);
 
     res.status(200).json({ message: "success", id: id });
   } catch (e) {
@@ -43,24 +41,32 @@ export default async function handler(
   }
 }
 
-async function run_processing(id: string, filepath: string) {
+function run_processing(id: string, filepath: string) {
   var shell = require("shelljs");
-  
-  shell.mkdir(`${process.env.FRAMES_PATH}/${id}`);
-  await new Promise((resolve) => setTimeout(resolve, 500));
 
-  var output = shell.exec(
+  shell.mkdir(`${process.env.FRAMES_PATH}/${id}`);
+
+  shell.exec(
     "ffmpeg -r 1 -i " +
       filepath +
-      ` -r 1 "${process.env.FRAMES_PATH}/${id}/img%05d.png"`
+      ` -r 1 "${process.env.FRAMES_PATH}/${id}/img%05d.png"`,
+    { async: true, silent: true },
+    function (code: any, stdout: any, stderr: any) {
+      console.log("FFmpeg success:", code);
+      if (code == 0) {
+        console.log("Program output:", stdout);
+        shell.exec(
+          `${process.env.CATER_PATH} init ${process.env.FRAMES_PATH}/${id}`
+        );
+        shell.exec(
+          `${process.env.CATER_PATH} track ${process.env.FRAMES_PATH}/${id}_output/now/results.yml`
+        , { async: true, silent: true }, function (code: any, stdout: any, stderr: any) {
+          console.log("Cater Success:", code);
+        });
+      } else {
+        console.log("Program stderr:", stderr);
+      }
+    }
   );
-  await new Promise((resolve) => setTimeout(resolve, 500));
 
-  var output2 = shell.exec(
-    `${process.env.CATER_PATH} init ${process.env.FRAMES_PATH}/${id}`
-  );
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  var output3 = shell.exec(
-    `${process.env.CATER_PATH} track ${process.env.FRAMES_PATH}/${id}_output/now/results.yml`
-  );
 }
