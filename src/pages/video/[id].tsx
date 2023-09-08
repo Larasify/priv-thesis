@@ -279,7 +279,7 @@ export default function VideoPage() {
                     "Are you sure you wish to delete this video and all the proccessing data generated?"
                   ) == true
                 ) {
-                  fetch(`/api/deletevideo/${id}`, {
+                  fetch(`/api/deletevideo`, {
                     method: "POST",
                     headers: {
                       "Content-Type": "application/json",
@@ -290,8 +290,6 @@ export default function VideoPage() {
                   }).then(async (res) => {
                     console.log(res);
                     if (res.status == 200) {
-                      console.log("video deleted");
-
                       await router.push(`/`);
                     } else {
                       await router.push(`/404`);
