@@ -2,10 +2,11 @@ import React, { FormEvent, useRef, useState } from "react";
 
 import dynamic from "next/dynamic";
 
-import { FaArrowRight } from "react-icons/fa";
+import { FaArrowRight, FaCode, FaInfo } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { z } from "zod";
 import { useRouter } from "next/router";
+import Link from "next/link";
 
 export default function Home() {
   const router = useRouter();
@@ -67,56 +68,75 @@ export default function Home() {
   };
   return (
     <>
-      <div className="text-center font-mono text-3xl text-neutral-500 font-bold">
-        CATER INTERFACE
-      </div>
-      <div className="flex flex-col align-middle items-center gap-14 pt-48 font-mono">
-        <form onSubmit={handleSubmit}>
-          <div className="mx-auto flex max-w-[330px] justify-center gap-2">
-            <input
-              name="code"
-              id="code"
-              autoComplete="off"
-              placeholder="enter video code"
-              type="text"
-              className="input-bordered input w-full max-w-xs"
-              ref={codeRef}
-            />
-            <button
-              type="submit"
-              disabled={isJoiningRoom}
-              className={`h-10 w-12 place-items-center rounded-l-none`}
-            >
-              <FaArrowRight className="text-bg text-primary" />
+      <div className="flex flex-col justify-between h-screen">
+        <div className="text-center font-mono text-3xl text-neutral-200 font-bold pt-4">
+          CATER WEB INTERFACE
+        </div>
+        <div className="flex flex-col align-middle items-center gap-14 pt-48 font-mono h-full">
+          <form onSubmit={handleSubmit}>
+            <div className="mx-auto flex max-w-[330px] justify-center gap-2">
+              <input
+                name="code"
+                id="code"
+                autoComplete="off"
+                placeholder="enter video code"
+                type="text"
+                className="input-bordered rounded-r-sm input w-full max-w-xs"
+                ref={codeRef}
+              />
+              <button
+                type="submit"
+                disabled={isJoiningRoom}
+                className={`h-10 w-12 place-items-center rounded-l-none`}
+              >
+                <div className="p-4 rounded-2xl rounded-l-sm btn btn-primary">
+                  <FaArrowRight className="text-neutral-200" />
+                </div>
+              </button>
+            </div>
+          </form>
+
+          <div className="font-bold text-neutral-200 text-xl">or</div>
+
+          <form
+            onSubmit={uploadFile}
+            className="flex flex-col align-middle items-center gap-2"
+          >
+            <div className="form-control w-full max-w-xs">
+              <label className="label">
+                <span className="label-text">Pick a file</span>
+                <span className="label-text-alt">MP4 Format</span>
+              </label>
+              <input
+                type="file"
+                className="file-input file-input-bordered w-full max-w-xs"
+                onChange={(e) => {
+                  if (e.target.files) {
+                    setFile(e.target.files[0]);
+                  }
+                }}
+              />
+            </div>
+            <button type="submit" className="btn btn-primary">
+              Submit File
             </button>
-          </div>
-        </form>
-
-        <div className="font-bold text-xl">or</div>
-
-        <form
-          onSubmit={uploadFile}
-          className="flex flex-col align-middle items-center gap-2"
-        >
-          <div className="form-control w-full max-w-xs">
-            <label className="label">
-              <span className="label-text">Pick a file</span>
-              <span className="label-text-alt">MP4 Format</span>
-            </label>
-            <input
-              type="file"
-              className="file-input file-input-bordered w-full max-w-xs"
-              onChange={(e) => {
-                if (e.target.files) {
-                  setFile(e.target.files[0]);
-                }
-              }}
-            />
-          </div>
-          <button type="submit" className="btn btn-primary">
-            Submit File
-          </button>
-        </form>
+          </form>
+        </div>
+        <div className="flex items-end justify-around bg-transparent pb-8 font-mono">
+          <Link
+            href="https://github.com/larasify"
+            className="flex cursor-pointer items-center space-x-1.5 text-sm transition-colors duration-200 hover:text-primary"
+          >
+            <FaCode />
+            <div>github</div>
+          </Link>
+          <Link
+            href="/about"
+            className="flex cursor-pointer items-center space-x-1.5 text-sm transition-colors duration-200 hover:text-primary"
+          >
+            <FaInfo /> <div>about</div>
+          </Link>
+        </div>
       </div>
     </>
   );
