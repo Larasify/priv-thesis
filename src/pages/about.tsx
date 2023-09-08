@@ -49,21 +49,21 @@ export default function About() {
           </div>
           <Link
             href="https://cater.cvmls.org/"
-            className="text-stone-400 hover:text-primary w-max"
+            className="text-stone-400 hover:text-primary w-max underline"
           >
             Check out CATER
           </Link>
 
           <Link
             href="https://www.youtube.com/channel/UCEq3lmqb56v6azWiaE-bSrw"
-            className="text-stone-400 hover:text-primary w-max flex flex-row gap-2 items-center"
+            className="text-stone-400 hover:text-primary w-max flex flex-row gap-2 items-center underline"
           >
             <SiYoutube /> Demo Video
           </Link>
 
           <Link
             href="/thesis.pdf"
-            className="text-stone-400 hover:text-primary w-max flex flex-row gap-2 items-center"
+            className="text-stone-400 hover:text-primary w-max flex flex-row gap-2 items-center underline"
           >
             <FaDownload /> Download Thesis
           </Link>
