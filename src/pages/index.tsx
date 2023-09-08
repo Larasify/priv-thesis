@@ -2,7 +2,7 @@ import React, { FormEvent, useRef, useState } from "react";
 
 import dynamic from "next/dynamic";
 
-import { FaArrowRight, FaCode, FaInfo } from "react-icons/fa";
+import { FaArrowRight, FaCode, FaExpand, FaInfo } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { z } from "zod";
 import { useRouter } from "next/router";
@@ -69,8 +69,8 @@ export default function Home() {
   return (
     <>
       <div className="flex flex-col justify-between h-screen">
-        <div className="text-center font-mono text-3xl text-neutral-200 font-bold pt-4">
-          CATER WEB INTERFACE
+        <div className="flex flex-row align-middle items-center font-mono mx-auto gap-4 text-3xl text-neutral-200 font-bold pt-4">
+            <FaExpand className=" text-primary" /> CATER WEB INTERFACE
         </div>
         <div className="flex flex-col align-middle items-center gap-14 pt-48 font-mono h-full">
           <form onSubmit={handleSubmit}>

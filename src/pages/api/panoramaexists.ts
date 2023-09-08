@@ -13,7 +13,7 @@ export default async function generatepanorama(
   console.log(id);
   var shell = require("shelljs");
 
-  shell.mkdir("-p",`./public/panorama/`);
+  shell.mkdir("-p",`./public/files/panorama/`);
 
   var output = shell.cp(
     `-u`,
