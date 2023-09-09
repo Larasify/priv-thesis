@@ -123,8 +123,8 @@ export default function VideoPage() {
 
   if (loadingOverlay) {
     return (
-      <div className="flex flex-col align-middle items-center pt-4 font-mono">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+      <div className="flex flex-col align-middle h-screen w-screen justify-center items-center pt-4 font-mono">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
   }
