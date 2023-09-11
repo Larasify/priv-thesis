@@ -33,6 +33,5 @@ export default async function getoverlay(
 
   //return files array as json
   res.status(200).json(frames);
-
-  //res.status(200).json({ name: 'John Doe' })
+  
 }

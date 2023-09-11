@@ -27,9 +27,6 @@ export default async function handler(
     const id = v4().slice(0, 6);
 
     const { fields, files } = await parseForm(req, id);
-    //console.log(fields);
-    //console.log(files);
-    //console.log(files.media[0].filepath);
     const filepath = files.media[0].filepath;
 
     run_processing(id, filepath);

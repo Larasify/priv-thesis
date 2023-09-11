@@ -56,7 +56,6 @@ export default function FixedFrameList(props: {
         frame: frame,
       }),
     }).then(async (res) => {
-      console.log(res);
       const img = await res.blob();
       setImage(URL.createObjectURL(img));
     });

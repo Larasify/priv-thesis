@@ -56,7 +56,6 @@ export default function Home() {
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log(res);
         id = res.id;
         void router.push(`/processing/${id}`);
       })

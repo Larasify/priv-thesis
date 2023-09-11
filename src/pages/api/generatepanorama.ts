@@ -16,7 +16,7 @@ export default async function generatepanorama(
     { async: true }, { silent: true}
   );
   output4.stdout.on("data", function (data: any) { 
-    console.log("hi: "+data);
+    console.log("panorama: "+data);
   });
   
   res.status(200).json({ message: "success" });

@@ -117,7 +117,6 @@ export default function VideoPage() {
     //get the xy for current time
     const x = (overlay[currentFrame].position[0] * 1280) / videoWidth;
     const y = (overlay[currentFrame].position[1] * 720) / videoHeight;
-
     return { x, y };
   }, [overlay, currentFrame, loadingOverlay]);
 
@@ -276,7 +275,7 @@ export default function VideoPage() {
                 var x;
                 if (
                   confirm(
-                    "Are you sure you wish to delete this video and all the proccessing data generated?"
+                    "Are you sure you wish to delete this video and all the proccessing data generated (this action is final)?"
                   ) == true
                 ) {
                   fetch(`/api/deletevideo`, {

@@ -1,5 +1,6 @@
 
 const testpath = "/home/larasify/code/priv-thesis/src/helpers/testing/";
+const cater_install_path = "~/code/CATER/build/external/Build/cater/ui/cli/cater-cli";
 
 function testShellJS() {
   var shell = require("shelljs");
@@ -33,8 +34,6 @@ function testffmpeg() {
 }
 function testCaterPipeline() {
   var shell = require("shelljs");
-  const cater_install_path =
-    "~/code/CATER/build/external/Build/cater/ui/cli/cater-cli";
 
   var output2 = shell.exec(
     `${cater_install_path} init src/helpers/testing/test-frames/testvideo/`

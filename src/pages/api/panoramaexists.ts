@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 
-export default async function generatepanorama(
+export default async function panoramaexists(
   req: NextApiRequest,
   res: NextApiResponse<{ message: string }>
 ) {
@@ -8,11 +8,9 @@ export default async function generatepanorama(
     res.status(405).send({ message: "Only POST requests allowed" });
     return;
   }
-  console.log(req.body);
   const id = req.body.id;
-  console.log(id);
-  var shell = require("shelljs");
 
+  var shell = require("shelljs");
   shell.mkdir("-p",`./public/files/panorama/`);
 
   var output = shell.cp(

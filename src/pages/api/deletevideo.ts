@@ -8,9 +8,7 @@ export default async function deletevideo(
     res.status(405).send({ message: "Only POST requests allowed" });
     return;
   }
-  console.log(req.body);
   const id = req.body.id;
-  console.log(id);
   var shell = require("shelljs");
 
   var output = shell.rm("-rf", `${process.env.BUILD_PATH}/public/files/${id}.mp4`);

@@ -8,12 +8,11 @@ export const config = {
     },
   }
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default function getimage(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "POST") {
     res.status(405).send({ message: "Only POST requests allowed" });
     return;
   }
-  console.log(req.body);
   const { id, frame } = req.body;
   //make frame number 5 digit with leading zeros
   if (!frame) {
@@ -26,7 +25,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     `${process.env.FRAMES_PATH}/${id}/`,
     imgName
   );
-  console.log(imagePath);
 
   fs.readFile(imagePath, (err, data) => {
     if (err) {
