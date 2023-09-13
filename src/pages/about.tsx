@@ -24,7 +24,7 @@ export default function About() {
       <div className=" flex h-full items-center p-10 pt-12 font-mono text-lg font-semibold text-neutral-500 max-w-4xl mx-auto">
         <div className="flex flex-col gap-10">
           <span>
-            This project was done as a thesis project for the University of
+            This project was created as a thesis project for the University of
             Sheffield by Eylül Lara Çıkış
           </span>
           <div className="flex flex-col gap-2 text-4xl text-stone-400">
